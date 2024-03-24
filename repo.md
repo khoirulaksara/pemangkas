@@ -1,4 +1,4 @@
 ---
-title: Jekyll URL Shortener
-redirect_to: https://github.com/hlaueriksson/jekyll-url-shortener
+title: Serat.Us | Platform Undandan Digital Kekinian
+redirect_to: https://serat.us/
 ---
