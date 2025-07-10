@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alasan Developer - Glassmorphism Bergerak</title>
+    <title>Alasan Developer - Fullscreen Glassmorphism</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,46 +12,80 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            /* Latar belakang gradien awal yang akan bergerak */
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            background-size: 200% 200%; /* Ukuran latar belakang lebih besar dari viewport */
-            animation: gradientAnimation 60s ease infinite; /* Animasi gradien lembut */
-            overflow: hidden; /* Sembunyikan scrollbar yang mungkin muncul dari animasi background */
-            position: relative; /* Diperlukan untuk pseudo-element atau efek overlay */
+            /* Latar belakang gradien awal untuk animasi warna-warni */
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #fbc2eb 100%);
+            background-size: 300% 300%; /* Ukuran lebih besar untuk gerakan yang lebih luas */
+            animation: gradientAnimation 90s ease infinite; /* Animasi gradien yang sangat lembut dan lambat */
+            overflow: hidden; /* Sembunyikan scrollbar */
+            position: relative;
         }
 
         /* Animasi gradien untuk latar belakang */
         @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% { background-position: 0% 0%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+            100% { background-position: 0% 0%; }
         }
 
-        /* Container utama dengan efek glassmorphism */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.1); /* Transparansi untuk efek kaca */
-            backdrop-filter: blur(15px); /* Efek blur yang lebih kuat */
-            -webkit-backdrop-filter: blur(15px); /* Kompatibilitas Safari */
-            border-radius: 25px; /* Sudut membulat yang lebih besar */
-            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.2); /* Bayangan yang lebih menonjol */
-            padding: 40px;
-            width: 90%;
-            max-width: 600px; /* Lebar maksimal panel */
-            box-sizing: border-box;
-            color: #333; /* Warna teks */
+        /* Kontainer teks utama dengan efek glassmorphism fullscreen */
+        .fullscreen-glass-panel {
+            /* Menjadikan panel ini mengisi sebagian besar layar */
+            width: 90vw; /* 90% lebar viewport */
+            height: 80vh; /* 80% tinggi viewport */
+            max-width: 900px; /* Batasan lebar maksimal */
+            max-height: 500px; /* Batasan tinggi maksimal */
+
+            /* Efek glassmorphism */
+            background: rgba(255, 255, 255, 0.08); /* Transparansi sangat rendah */
+            backdrop-filter: blur(25px); /* Blur yang sangat kuat untuk efek kaca penuh */
+            -webkit-backdrop-filter: blur(25px); /* Kompatibilitas Safari */
+            border-radius: 30px; /* Sudut membulat yang lebih besar untuk tampilan modern */
+            box-shadow: 0 15px 60px 0 rgba(0, 0, 0, 0.25); /* Bayangan yang lebih dramatis */
+            border: none; /* Pastikan tidak ada border yang terlihat */
+
+            /* Penataan teks */
+            display: flex;
+            align-items: center; /* Pusatkan teks secara vertikal */
+            justify-content: center; /* Pusatkan teks secara horizontal */
             text-align: center;
-            font-size: 1.8em; /* Ukuran font yang lebih besar */
-            line-height: 1.5; /* Spasi baris untuk keterbacaan */
-            transition: opacity 1s ease-in-out; /* Transisi untuk fade in/out */
-            opacity: 1; /* Default opacity */
-            font-weight: 500; /* Sedikit lebih tebal */
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Bayangan teks ringan */
+            padding: 50px; /* Padding di dalam panel */
+            box-sizing: border-box; /* Memastikan padding tidak menambah ukuran total */
+
+            color: #f0f0f0; /* Warna teks putih/terang untuk kontras */
+            font-size: 2.5em; /* Ukuran font yang sangat besar */
+            line-height: 1.4; /* Spasi baris untuk keterbacaan */
+            font-weight: 600; /* Tebal teks */
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); /* Bayangan teks yang lebih kuat */
+
+            /* Transisi untuk fade in/out teks */
+            transition: opacity 1.5s ease-in-out; /* Transisi yang lebih lambat */
+            opacity: 1; /* Opacity default */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .fullscreen-glass-panel {
+                width: 95vw;
+                height: auto; /* Allow height to adjust based on content */
+                min-height: 60vh;
+                font-size: 1.8em;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .fullscreen-glass-panel {
+                font-size: 1.4em;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="excusePanel" class="glass-panel">
+    <div id="excusePanel" class="fullscreen-glass-panel">
         Memuat alasan...
     </div>
 
@@ -61,6 +95,7 @@
 
         async function fetchExcuses() {
             try {
+                // Gunakan URL Gist Anda
                 const res = await fetch("https://gist.githubusercontent.com/khoirulaksara/66a0404c464dd2ab8792cb698e999b22/raw/0fd4235dedb253ca1ec6716f9d5006c9c453819b/excused.json");
                 const json = await res.json();
                 allExcuses = json.excuses;
@@ -91,7 +126,7 @@
                 const text = allExcuses[Math.floor(Math.random() * allExcuses.length)];
                 excusePanel.textContent = text;
                 excusePanel.style.opacity = 1; // Fade in efek
-            }, 1000); // 1 detik jeda untuk fade out
+            }, 1500); // Jeda yang lebih lama (1.5 detik) untuk fade out/in yang lebih lembut
         }
 
         // Jalankan saat pertama kali
