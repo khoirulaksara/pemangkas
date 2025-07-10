@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excuse Canvas - Glassmorphism dengan Transisi & Background Bergerak</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); /* Latar belakang gradien awal */
+            background-size: 200% 200%; /* Ukuran latar belakang lebih besar dari viewport */
+            animation: gradientAnimation 60s ease infinite; /* Animasi gradien lembut */
+            overflow: hidden; /* Sembunyikan scrollbar jika background bergerak */
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            border: none;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease-in-out; /* Transisi untuk fade in/out saat ganti teks */
+            opacity: 1; /* Default opacity */
+        }
+
+        #quoteCanvas {
+            background: transparent;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-container">
+        <canvas id="quoteCanvas" width="600" height="200"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("quoteCanvas");
+        const ctx = canvas.getContext("2d");
+        const glassContainer = document.querySelector(".glass-container");
+        const padding = 30;
+        const lineHeight = 30;
+
+        let allExcuses = []; // Untuk menyimpan semua alasan yang diambil
+
+        async function fetchExcuses() {
+            try {
+                const res = await fetch("https://gist.githubusercontent.com/khoirulaksara/66a0404c464dd2ab8792cb698e999b22/raw/0fd4235dedb253ca1ec6716f9d5006c9c453819b/excused.json");
+                const json = await res.json();
+                allExcuses = json.excuses;
+
+                if (!Array.isArray(allExcuses) || allExcuses.length === 0) {
+                    drawText("Tidak ada alasan yang tersedia.");
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                console.error(err);
+                drawText("Gagal memuat alasan.");
+                return false;
+            }
+        }
+
+        function drawText(text) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = "24px 'Segoe UI', sans-serif";
+            ctx.fillStyle = "#333";
+
+            const maxWidth = canvas.width - padding * 2;
+            const words = text.split(" ");
+            let lines = [];
+            let tempLine = "";
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = tempLine + words[n] + " ";
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    lines.push(tempLine.trim()); // Hapus spasi di akhir baris
+                    tempLine = words[n] + " ";
+                } else {
+                    tempLine = testLine;
+                }
+            }
+            lines.push(tempLine.trim()); // Tambahkan baris terakhir
+
+            const totalTextHeight = lines.length * lineHeight;
+            const startY = (canvas.height / 2) - (totalTextHeight / 2) + (lineHeight / 2);
+
+            lines.forEach((l, index) => {
+                ctx.fillText(l, padding, startY + (index * lineHeight));
+            });
+        }
+
+        async function displayRandomExcuse() {
+            if (allExcuses.length === 0) {
+                const fetched = await fetchExcuses();
+                if (!fetched) return;
+            }
+
+            // Fade out
+            glassContainer.style.opacity = 0;
+
+            setTimeout(() => {
+                const text = allExcuses[Math.floor(Math.random() * allExcuses.length)];
+                drawText(text);
+                // Fade in
+                glassContainer.style.opacity = 1;
+            }, 1000); // Tunggu 1 detik untuk fade out selesai sebelum ganti teks dan fade in
+        }
+
+        // Jalankan saat pertama kali
+        displayRandomExcuse();
+
+        // Atur interval untuk transisi setiap 30 detik
+        setInterval(displayRandomExcuse, 30000);
+    </script>
+</body>
+</html>
